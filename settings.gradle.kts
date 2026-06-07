@@ -17,5 +17,6 @@ rootProject.name = "sstt"
 
 include(
     "data:eventstore",
+    "data:identity",
     "data:migration",
 )
