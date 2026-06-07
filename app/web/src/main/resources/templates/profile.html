@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Profile</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="shell">
+  <section class="profile-layout">
+    <div class="profile-summary">
+      <p class="eyebrow">Student card</p>
+      <h1 th:text="${student != null ? student.fullName : 'Student profile'}">Student profile</h1>
+      <dl th:if="${student != null}">
+        <div>
+          <dt>Email</dt>
+          <dd th:text="${student.email}">student@example.com</dd>
+        </div>
+        <div>
+          <dt>Group</dt>
+          <dd th:text="${student.groupName}">IKBO-00-00</dd>
+        </div>
+        <div>
+          <dt>Stream version</dt>
+          <dd th:text="${student.streamVersion}">1</dd>
+        </div>
+      </dl>
+    </div>
+
+    <form class="profile-form" method="post" th:action="@{/profile}" th:object="${profileForm}">
+      <div class="notice" th:if="${saved}">Profile updated</div>
+
+      <label>
+        <span>Full name</span>
+        <input type="text" th:field="*{fullName}" autocomplete="name">
+        <small th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Required</small>
+      </label>
+
+      <label>
+        <span>Email</span>
+        <input type="email" th:field="*{email}" autocomplete="email">
+        <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Invalid email</small>
+      </label>
+
+      <label>
+        <span>Group</span>
+        <input type="text" th:field="*{groupName}">
+        <small th:if="${#fields.hasErrors('groupName')}" th:errors="*{groupName}">Required</small>
+      </label>
+
+      <button type="submit">Save profile</button>
+    </form>
+  </section>
+</main>
+</body>
+</html>

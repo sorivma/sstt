@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: sstt-web
+  r2dbc:
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://sstt:sstt@localhost:5432/sstt}
+  flyway:
+    enabled: true
+    url: ${SPRING_FLYWAY_URL:jdbc:postgresql://localhost:5432/sstt}
+    user: ${SPRING_FLYWAY_USER:sstt}
+    password: ${SPRING_FLYWAY_PASSWORD:sstt}
+    locations: classpath:db/migration
+  thymeleaf:
+    cache: false
+
+server:
+  port: ${SERVER_PORT:8080}
+
+sstt:
+  current-student:
+    id: ${SSTT_CURRENT_STUDENT_ID:00000000-0000-0000-0000-000000000001}
+    default-full-name: ${SSTT_CURRENT_STUDENT_FULL_NAME:Student Name}
+    default-email: ${SSTT_CURRENT_STUDENT_EMAIL:student@example.com}
+    default-group-name: ${SSTT_CURRENT_STUDENT_GROUP:IKBO-00-00}

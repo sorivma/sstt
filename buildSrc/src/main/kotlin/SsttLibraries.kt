@@ -15,6 +15,11 @@ object SsttLibraries {
     const val postgresql = "org.postgresql:postgresql"
 
     const val springBootStarterTest = "org.springframework.boot:spring-boot-starter-test"
+    const val springBootStarterThymeleaf = "org.springframework.boot:spring-boot-starter-thymeleaf"
+    const val springBootStarterValidation = "org.springframework.boot:spring-boot-starter-validation"
+    const val springBootStarterWebflux = "org.springframework.boot:spring-boot-starter-webflux"
+    const val springBootStarterDataR2dbc = "org.springframework.boot:spring-boot-starter-data-r2dbc"
+    const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect"
     const val junitPlatformLauncher = "org.junit.platform:junit-platform-launcher"
     const val h2 = "com.h2database:h2"
 }
