@@ -21,7 +21,13 @@ tasks.processResources {
 }
 
 dependencies {
+    implementation(project(":data:academics"))
+    implementation(project(":data:assistant"))
+    implementation(project(":data:contextgraph"))
     implementation(project(":data:eventstore"))
     implementation(project(":data:identity"))
+    implementation(project(":data:materials"))
     implementation(project(":data:migration"))
+    implementation(project(":data:sources"))
+    implementation(project(":data:tasks"))
 }
