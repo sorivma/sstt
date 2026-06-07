@@ -7,7 +7,6 @@ import com.sstt.data.eventstore.error.EventStoreException
 import com.sstt.data.eventstore.error.StreamConcurrencyException
 import com.sstt.data.eventstore.model.AppendEventsCommand
 import com.sstt.data.eventstore.model.AppendEventsResult
-import com.sstt.data.eventstore.model.EventStoreConfiguration
 import com.sstt.data.eventstore.model.ExpectedVersion
 import com.sstt.data.eventstore.model.NewEvent
 import com.sstt.data.eventstore.model.StoredEvent
@@ -35,7 +34,6 @@ class PostgreSqlEventStore(
     private val databaseClient: DatabaseClient,
     private val transactionalOperator: TransactionalOperator,
     private val objectMapper: ObjectMapper,
-    private val configuration: EventStoreConfiguration = EventStoreConfiguration(),
     private val clock: Clock = Clock.systemUTC(),
     private val streamIdGenerator: () -> UUID = UUID::randomUUID,
 ) : EventStore {
@@ -133,10 +131,6 @@ class PostgreSqlEventStore(
     }
 
     private fun validateCommand(command: AppendEventsCommand) {
-        check(configuration.strictCommitOrder) {
-            "PostgreSqlEventStore requires strictCommitOrder=true"
-        }
-
         val duplicateEventIds = command.events
             .groupBy { it.eventId }
             .filterValues { it.size > 1 }

@@ -56,13 +56,6 @@ class EventStoreModelTest {
         }
     }
 
-    @Test
-    fun `event store configuration requires positive batch size`() {
-        assertThrows(IllegalArgumentException::class.java) {
-            EventStoreConfiguration(defaultReadBatchSize = 0)
-        }
-    }
-
     private fun uuid(value: Long): UUID {
         return UUID.fromString("00000000-0000-0000-0000-${value.toString(16).padStart(12, '0')}")
     }
