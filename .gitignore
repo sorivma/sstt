@@ -3,6 +3,7 @@ DESIGN.md
 .gradle/
 build/
 out/
+node_modules/
 
 *.class
 *.log
