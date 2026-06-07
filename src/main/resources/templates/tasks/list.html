@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Задачи - SSTT</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header th:replace="~{fragments/layout :: topbar}"></header>
+<main class="container">
+    <div class="page-head">
+        <div>
+            <h1>Задачи</h1>
+            <div class="muted">Первый рабочий список учебных задач.</div>
+        </div>
+        <div class="actions">
+            <a class="button secondary" th:href="@{/sources/new}">Добавить сообщение</a>
+            <a class="button" th:href="@{/tasks/new}">Создать задачу</a>
+        </div>
+    </div>
+
+    <section class="panel">
+        <table class="table" th:if="${!tasks.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Задача</th>
+                <th>Предмет</th>
+                <th>Дедлайн</th>
+                <th>Статус</th>
+                <th>Приоритет</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="task : ${tasks}">
+                <td>
+                    <strong th:text="${task.title()}">Лабораторная</strong>
+                    <div class="muted" th:text="${task.description()}">Описание</div>
+                </td>
+                <td>
+                    <span th:text="${task.subjectName() ?: 'Без предмета'}">Предмет</span>
+                    <div class="muted" th:if="${task.teacherName() != null}" th:text="${task.teacherName()}">Преподаватель</div>
+                </td>
+                <td th:text="${task.deadlineDate() ?: 'Не задан'}">2026-06-10</td>
+                <td><span class="badge" th:text="${task.status()}">INBOX</span></td>
+                <td th:text="${task.priority()}">MEDIUM</td>
+            </tr>
+            </tbody>
+        </table>
+        <div th:if="${tasks.isEmpty()}">
+            <h2>Пока нет задач</h2>
+            <p class="muted">Начни с сообщения от преподавателя или создай задачу вручную.</p>
+            <div class="actions">
+                <a class="button" th:href="@{/sources/new}">Добавить сообщение</a>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>
