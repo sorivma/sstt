@@ -1,4 +1,4 @@
-package com.sstt.data.contextgraph
+﻿package com.sstt.data.contextgraph
 
 import com.sstt.data.contextgraph.model.RelationRecord
 import java.time.Instant
@@ -37,7 +37,7 @@ class RelationReadRepository(private val databaseClient: DatabaseClient) {
             """
             select relation_id, student_id, from_entity_type, from_entity_id, relation_type,
                    to_entity_type, to_entity_id, active, stream_version, created_at, updated_at
-            from contextgraph.relations
+            from projections.relations
             $whereClause
             """.trimIndent(),
         )

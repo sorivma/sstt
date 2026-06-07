@@ -1,4 +1,4 @@
-package com.sstt.data.materials
+﻿package com.sstt.data.materials
 
 import com.sstt.data.materials.model.MaterialRecord
 import java.time.Instant
@@ -27,7 +27,7 @@ class MaterialReadRepository(private val databaseClient: DatabaseClient) {
             """
             select material_id, student_id, file_name, content_type, storage_key, summary,
                    stream_version, created_at, updated_at
-            from materials.materials
+            from projections.materials
             $whereClause
             """.trimIndent(),
         )

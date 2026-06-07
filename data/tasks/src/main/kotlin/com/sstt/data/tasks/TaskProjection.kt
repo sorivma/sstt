@@ -1,4 +1,4 @@
-package com.sstt.data.tasks
+﻿package com.sstt.data.tasks
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.sstt.data.eventstore.model.StoredEvent
@@ -14,6 +14,10 @@ class TaskProjection(private val databaseClient: DatabaseClient) : EventProjecti
 
     override fun apply(event: StoredEvent): Mono<Void> {
         return when (event.eventType) {
+            TaskEventTypes.TASK_STATUS_CREATED -> applyStatusCreated(event)
+            TaskEventTypes.TASK_STATUS_RENAMED -> applyStatusRenamed(event)
+            TaskEventTypes.TASK_STATUS_REORDERED -> applyStatusReordered(event)
+            TaskEventTypes.TASK_STATUS_DISABLED -> applyStatusDisabled(event)
             TaskEventTypes.TASK_CREATED -> applyTaskCreated(event)
             TaskEventTypes.TASK_DETAILS_CHANGED -> applyDetailsChanged(event)
             TaskEventTypes.TASK_STATUS_CHANGED -> applyStatusChanged(event)
@@ -21,16 +25,111 @@ class TaskProjection(private val databaseClient: DatabaseClient) : EventProjecti
         }
     }
 
+    private fun applyStatusCreated(event: StoredEvent): Mono<Void> {
+        return databaseClient.sql(
+            """
+            insert into projections.task_statuses (
+                status_id, student_id, status_key, title, icon, sort_order, terminal,
+                active, stream_version, created_at, updated_at
+            )
+            values (
+                :status_id, :student_id, :status_key, :title, :icon, :sort_order, :terminal,
+                true, :stream_version, :created_at, :updated_at
+            )
+            on conflict (status_id) do update
+            set title = excluded.title,
+                icon = excluded.icon,
+                sort_order = excluded.sort_order,
+                terminal = excluded.terminal,
+                active = true,
+                stream_version = excluded.stream_version,
+                updated_at = excluded.updated_at
+            where projections.task_statuses.stream_version < excluded.stream_version
+            """.trimIndent(),
+        )
+            .bind("status_id", uuid(event.payload["status_id"]))
+            .bind("student_id", uuid(event.payload["student_id"]))
+            .bind("status_key", event.payload["key"].asText())
+            .bind("title", event.payload["title"].asText())
+            .bind("icon", event.payload["icon"].asText())
+            .bind("sort_order", event.payload["sort_order"].asInt())
+            .bind("terminal", event.payload["terminal"].asBoolean())
+            .bind("stream_version", event.streamVersion)
+            .bind("created_at", event.occurredAt)
+            .bind("updated_at", event.occurredAt)
+            .fetch()
+            .rowsUpdated()
+            .then()
+    }
+
+    private fun applyStatusRenamed(event: StoredEvent): Mono<Void> {
+        return databaseClient.sql(
+            """
+            update projections.task_statuses
+            set title = :title,
+                icon = :icon,
+                stream_version = :stream_version,
+                updated_at = :updated_at
+            where status_id = :status_id and stream_version < :stream_version
+            """.trimIndent(),
+        )
+            .bind("status_id", uuid(event.payload["status_id"]))
+            .bind("title", event.payload["title"].asText())
+            .bind("icon", event.payload["icon"].asText())
+            .bind("stream_version", event.streamVersion)
+            .bind("updated_at", event.occurredAt)
+            .fetch()
+            .rowsUpdated()
+            .then()
+    }
+
+    private fun applyStatusReordered(event: StoredEvent): Mono<Void> {
+        return databaseClient.sql(
+            """
+            update projections.task_statuses
+            set sort_order = :sort_order,
+                stream_version = :stream_version,
+                updated_at = :updated_at
+            where status_id = :status_id and stream_version < :stream_version
+            """.trimIndent(),
+        )
+            .bind("status_id", uuid(event.payload["status_id"]))
+            .bind("sort_order", event.payload["sort_order"].asInt())
+            .bind("stream_version", event.streamVersion)
+            .bind("updated_at", event.occurredAt)
+            .fetch()
+            .rowsUpdated()
+            .then()
+    }
+
+    private fun applyStatusDisabled(event: StoredEvent): Mono<Void> {
+        return databaseClient.sql(
+            """
+            update projections.task_statuses
+            set active = false,
+                stream_version = :stream_version,
+                updated_at = :updated_at
+            where status_id = :status_id and stream_version < :stream_version
+            """.trimIndent(),
+        )
+            .bind("status_id", uuid(event.payload["status_id"]))
+            .bind("stream_version", event.streamVersion)
+            .bind("updated_at", event.occurredAt)
+            .fetch()
+            .rowsUpdated()
+            .then()
+    }
+
     private fun applyTaskCreated(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            insert into tasks.tasks (
+            insert into projections.tasks (
                 task_id, student_id, title, description, subject_id, teacher_id, semester_id,
-                status, priority, deadline, stream_version, created_at, updated_at
+                status_key, priority, deadline, stream_version, created_at, updated_at
             )
             values (
                 :task_id, :student_id, :title, :description, :subject_id, :teacher_id, :semester_id,
-                :status, :priority, :deadline, :stream_version, :created_at, :updated_at
+                :status_key, :priority, :deadline, :stream_version, :created_at, :updated_at
             )
             on conflict (task_id) do update
             set title = excluded.title,
@@ -38,12 +137,12 @@ class TaskProjection(private val databaseClient: DatabaseClient) : EventProjecti
                 subject_id = excluded.subject_id,
                 teacher_id = excluded.teacher_id,
                 semester_id = excluded.semester_id,
-                status = excluded.status,
+                status_key = excluded.status_key,
                 priority = excluded.priority,
                 deadline = excluded.deadline,
                 stream_version = excluded.stream_version,
                 updated_at = excluded.updated_at
-            where tasks.tasks.stream_version < excluded.stream_version
+            where projections.tasks.stream_version < excluded.stream_version
             """.trimIndent(),
         )
             .bind("task_id", uuid(event.payload["task_id"]))
@@ -53,7 +152,7 @@ class TaskProjection(private val databaseClient: DatabaseClient) : EventProjecti
             .bindNullableUuid("subject_id", event.payload["subject_id"])
             .bindNullableUuid("teacher_id", event.payload["teacher_id"])
             .bindNullableUuid("semester_id", event.payload["semester_id"])
-            .bind("status", event.payload["status"].asText())
+            .bind("status_key", event.payload["status_key"].asText())
             .bind("priority", event.payload["priority"].asText())
             .bindNullableInstant("deadline", event.payload["deadline"])
             .bind("stream_version", event.streamVersion)
@@ -67,7 +166,7 @@ class TaskProjection(private val databaseClient: DatabaseClient) : EventProjecti
     private fun applyDetailsChanged(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            update tasks.tasks
+            update projections.tasks
             set title = :title,
                 description = :description,
                 subject_id = :subject_id,
@@ -98,13 +197,13 @@ class TaskProjection(private val databaseClient: DatabaseClient) : EventProjecti
     private fun applyStatusChanged(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            update tasks.tasks
-            set status = :status, stream_version = :stream_version, updated_at = :updated_at
+            update projections.tasks
+            set status_key = :status_key, stream_version = :stream_version, updated_at = :updated_at
             where task_id = :task_id and stream_version < :stream_version
             """.trimIndent(),
         )
             .bind("task_id", uuid(event.payload["task_id"]))
-            .bind("status", event.payload["status"].asText())
+            .bind("status_key", event.payload["status_key"].asText())
             .bind("stream_version", event.streamVersion)
             .bind("updated_at", event.occurredAt)
             .fetch()
@@ -129,6 +228,6 @@ class TaskProjection(private val databaseClient: DatabaseClient) : EventProjecti
     }
 
     companion object {
-        const val PROJECTION_NAME = "tasks.tasks"
+        const val PROJECTION_NAME = "projections.tasks"
     }
 }

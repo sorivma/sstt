@@ -1,4 +1,4 @@
-package com.sstt.data.contextgraph
+﻿package com.sstt.data.contextgraph
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.sstt.data.contextgraph.events.ContextGraphEventTypes
@@ -22,7 +22,7 @@ class RelationProjection(private val databaseClient: DatabaseClient) : EventProj
     private fun applyAdded(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            insert into contextgraph.relations (
+            insert into projections.relations (
                 relation_id, student_id, from_entity_type, from_entity_id, relation_type,
                 to_entity_type, to_entity_id, active, stream_version, created_at, updated_at
             )
@@ -34,7 +34,7 @@ class RelationProjection(private val databaseClient: DatabaseClient) : EventProj
             set active = true,
                 stream_version = excluded.stream_version,
                 updated_at = excluded.updated_at
-            where contextgraph.relations.stream_version < excluded.stream_version
+            where projections.relations.stream_version < excluded.stream_version
             """.trimIndent(),
         )
             .bind("relation_id", uuid(event.payload["relation_id"]))
@@ -55,7 +55,7 @@ class RelationProjection(private val databaseClient: DatabaseClient) : EventProj
     private fun applyRemoved(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            update contextgraph.relations
+            update projections.relations
             set active = false, stream_version = :stream_version, updated_at = :updated_at
             where relation_id = :relation_id and stream_version < :stream_version
             """.trimIndent(),
@@ -71,6 +71,6 @@ class RelationProjection(private val databaseClient: DatabaseClient) : EventProj
     private fun uuid(node: JsonNode): UUID = UUID.fromString(node.asText())
 
     companion object {
-        const val PROJECTION_NAME = "contextgraph.relations"
+        const val PROJECTION_NAME = "projections.relations"
     }
 }

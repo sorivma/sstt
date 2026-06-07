@@ -1,4 +1,4 @@
-package com.sstt.data.academics
+﻿package com.sstt.data.academics
 
 import com.sstt.data.academics.model.SemesterRecord
 import com.sstt.data.academics.model.SubjectRecord
@@ -12,28 +12,28 @@ import reactor.core.publisher.Mono
 
 class AcademicsReadRepository(private val databaseClient: DatabaseClient) {
     fun findSubjectById(subjectId: UUID): Mono<SubjectRecord> {
-        return databaseClient.sql("select subject_id, name, stream_version, created_at, updated_at from academics.subjects where subject_id = :subject_id")
+        return databaseClient.sql("select subject_id, name, stream_version, created_at, updated_at from projections.subjects where subject_id = :subject_id")
             .bind("subject_id", subjectId)
             .map { row -> mapSubject(row) }
             .one()
     }
 
     fun findTeacherById(teacherId: UUID): Mono<TeacherRecord> {
-        return databaseClient.sql("select teacher_id, full_name, email, stream_version, created_at, updated_at from academics.teachers where teacher_id = :teacher_id")
+        return databaseClient.sql("select teacher_id, full_name, email, stream_version, created_at, updated_at from projections.teachers where teacher_id = :teacher_id")
             .bind("teacher_id", teacherId)
             .map { row -> mapTeacher(row) }
             .one()
     }
 
-    fun listSubjects(): Flux<SubjectRecord> = databaseClient.sql("select subject_id, name, stream_version, created_at, updated_at from academics.subjects order by name")
+    fun listSubjects(): Flux<SubjectRecord> = databaseClient.sql("select subject_id, name, stream_version, created_at, updated_at from projections.subjects order by name")
         .map { row -> mapSubject(row) }
         .all()
 
-    fun listTeachers(): Flux<TeacherRecord> = databaseClient.sql("select teacher_id, full_name, email, stream_version, created_at, updated_at from academics.teachers order by full_name")
+    fun listTeachers(): Flux<TeacherRecord> = databaseClient.sql("select teacher_id, full_name, email, stream_version, created_at, updated_at from projections.teachers order by full_name")
         .map { row -> mapTeacher(row) }
         .all()
 
-    fun listSemesters(): Flux<SemesterRecord> = databaseClient.sql("select semester_id, name, starts_on, ends_on, stream_version, created_at, updated_at from academics.semesters order by starts_on nulls last, name")
+    fun listSemesters(): Flux<SemesterRecord> = databaseClient.sql("select semester_id, name, starts_on, ends_on, stream_version, created_at, updated_at from projections.semesters order by starts_on nulls last, name")
         .map { row ->
             SemesterRecord(
                 semesterId = row.require("semester_id", UUID::class.java),

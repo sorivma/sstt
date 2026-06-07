@@ -1,4 +1,4 @@
-package com.sstt.data.assistant
+﻿package com.sstt.data.assistant
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.sstt.data.assistant.events.AssistantEventTypes
@@ -22,7 +22,7 @@ class AssistantProjection(private val databaseClient: DatabaseClient) : EventPro
     private fun applyThreadStarted(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            insert into assistant.chat_threads (
+            insert into projections.chat_threads (
                 thread_id, student_id, title, last_message_at, stream_version, created_at, updated_at
             )
             values (
@@ -32,7 +32,7 @@ class AssistantProjection(private val databaseClient: DatabaseClient) : EventPro
             set title = excluded.title,
                 stream_version = excluded.stream_version,
                 updated_at = excluded.updated_at
-            where assistant.chat_threads.stream_version < excluded.stream_version
+            where projections.chat_threads.stream_version < excluded.stream_version
             """.trimIndent(),
         )
             .bind("thread_id", uuid(event.payload["thread_id"]))
@@ -49,7 +49,7 @@ class AssistantProjection(private val databaseClient: DatabaseClient) : EventPro
     private fun applyMessageAppended(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            insert into assistant.chat_messages (message_id, thread_id, role, content, created_at)
+            insert into projections.chat_messages (message_id, thread_id, role, content, created_at)
             values (:message_id, :thread_id, :role, :content, :created_at)
             on conflict (message_id) do nothing
             """.trimIndent(),
@@ -64,7 +64,7 @@ class AssistantProjection(private val databaseClient: DatabaseClient) : EventPro
             .then(
                 databaseClient.sql(
                     """
-                    update assistant.chat_threads
+                    update projections.chat_threads
                     set last_message_at = :last_message_at,
                         stream_version = :stream_version,
                         updated_at = :updated_at
@@ -84,6 +84,6 @@ class AssistantProjection(private val databaseClient: DatabaseClient) : EventPro
     private fun uuid(node: JsonNode): UUID = UUID.fromString(node.asText())
 
     companion object {
-        const val PROJECTION_NAME = "assistant.chat"
+        const val PROJECTION_NAME = "projections.assistant_chat"
     }
 }

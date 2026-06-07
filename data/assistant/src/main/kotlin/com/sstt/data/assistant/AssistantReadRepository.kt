@@ -1,4 +1,4 @@
-package com.sstt.data.assistant
+﻿package com.sstt.data.assistant
 
 import com.sstt.data.assistant.model.AssistantMessageRole
 import com.sstt.data.assistant.model.ChatMessageRecord
@@ -14,7 +14,7 @@ class AssistantReadRepository(private val databaseClient: DatabaseClient) {
         return databaseClient.sql(
             """
             select thread_id, student_id, title, last_message_at, stream_version, created_at, updated_at
-            from assistant.chat_threads
+            from projections.chat_threads
             where thread_id = :thread_id
             """.trimIndent(),
         )
@@ -27,7 +27,7 @@ class AssistantReadRepository(private val databaseClient: DatabaseClient) {
         return databaseClient.sql(
             """
             select thread_id, student_id, title, last_message_at, stream_version, created_at, updated_at
-            from assistant.chat_threads
+            from projections.chat_threads
             where student_id = :student_id
             order by coalesce(last_message_at, created_at) desc
             """.trimIndent(),
@@ -41,7 +41,7 @@ class AssistantReadRepository(private val databaseClient: DatabaseClient) {
         return databaseClient.sql(
             """
             select message_id, thread_id, role, content, created_at
-            from assistant.chat_messages
+            from projections.chat_messages
             where thread_id = :thread_id
             order by created_at, message_id
             """.trimIndent(),

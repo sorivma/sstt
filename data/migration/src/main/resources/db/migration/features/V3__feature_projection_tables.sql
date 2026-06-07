@@ -1,11 +1,6 @@
-create schema if not exists academics;
-create schema if not exists tasks;
-create schema if not exists sources;
-create schema if not exists materials;
-create schema if not exists contextgraph;
-create schema if not exists assistant;
+﻿create schema if not exists projections;
 
-create table academics.subjects (
+create table projections.subjects (
     subject_id uuid primary key,
     name text not null,
     stream_version bigint not null,
@@ -15,7 +10,7 @@ create table academics.subjects (
     constraint subjects_stream_version_positive check (stream_version > 0)
 );
 
-create table academics.teachers (
+create table projections.teachers (
     teacher_id uuid primary key,
     full_name text not null,
     email text,
@@ -27,7 +22,7 @@ create table academics.teachers (
     constraint teachers_stream_version_positive check (stream_version > 0)
 );
 
-create table academics.semesters (
+create table projections.semesters (
     semester_id uuid primary key,
     name text not null,
     starts_on date,
@@ -40,11 +35,30 @@ create table academics.semesters (
     constraint semesters_stream_version_positive check (stream_version > 0)
 );
 
-create index subjects_name_idx on academics.subjects (name);
-create index teachers_full_name_idx on academics.teachers (full_name);
-create index semesters_dates_idx on academics.semesters (starts_on, ends_on);
+create index subjects_name_idx on projections.subjects (name);
+create index teachers_full_name_idx on projections.teachers (full_name);
+create index semesters_dates_idx on projections.semesters (starts_on, ends_on);
 
-create table tasks.tasks (
+create table projections.task_statuses (
+    status_id uuid primary key,
+    student_id uuid not null,
+    status_key text not null,
+    title text not null,
+    icon text not null,
+    sort_order integer not null,
+    terminal boolean not null,
+    active boolean not null,
+    stream_version bigint not null,
+    created_at timestamptz not null,
+    updated_at timestamptz not null,
+    constraint task_statuses_status_key_format check (status_key ~ '^[a-z0-9][a-z0-9-]{0,63}$'),
+    constraint task_statuses_title_not_blank check (length(btrim(title)) > 0),
+    constraint task_statuses_icon_not_blank check (length(btrim(icon)) > 0),
+    constraint task_statuses_stream_version_positive check (stream_version > 0),
+    constraint task_statuses_student_key_unique unique (student_id, status_key)
+);
+
+create table projections.tasks (
     task_id uuid primary key,
     student_id uuid not null,
     title text not null,
@@ -52,23 +66,24 @@ create table tasks.tasks (
     subject_id uuid,
     teacher_id uuid,
     semester_id uuid,
-    status text not null,
+    status_key text not null,
     priority text not null,
     deadline timestamptz,
     stream_version bigint not null,
     created_at timestamptz not null,
     updated_at timestamptz not null,
     constraint tasks_title_not_blank check (length(btrim(title)) > 0),
-    constraint tasks_status_known check (status in ('BACKLOG', 'TODO', 'IN_PROGRESS', 'WAITING', 'DONE')),
+    constraint tasks_status_key_format check (status_key ~ '^[a-z0-9][a-z0-9-]{0,63}$'),
     constraint tasks_priority_known check (priority in ('LOW', 'NORMAL', 'HIGH', 'URGENT')),
     constraint tasks_stream_version_positive check (stream_version > 0)
 );
 
-create index tasks_student_status_idx on tasks.tasks (student_id, status, deadline);
-create index tasks_subject_idx on tasks.tasks (subject_id) where subject_id is not null;
-create index tasks_teacher_idx on tasks.tasks (teacher_id) where teacher_id is not null;
+create index task_statuses_student_order_idx on projections.task_statuses (student_id, active, sort_order);
+create index tasks_student_status_idx on projections.tasks (student_id, status_key, deadline);
+create index tasks_subject_idx on projections.tasks (subject_id) where subject_id is not null;
+create index tasks_teacher_idx on projections.tasks (teacher_id) where teacher_id is not null;
 
-create table sources.source_messages (
+create table projections.source_messages (
     message_id uuid primary key,
     student_id uuid not null,
     source_type text not null,
@@ -85,9 +100,9 @@ create table sources.source_messages (
     constraint source_messages_stream_version_positive check (stream_version > 0)
 );
 
-create index source_messages_student_status_idx on sources.source_messages (student_id, status, created_at desc);
+create index source_messages_student_status_idx on projections.source_messages (student_id, status, created_at desc);
 
-create table materials.materials (
+create table projections.materials (
     material_id uuid primary key,
     student_id uuid not null,
     file_name text not null,
@@ -102,9 +117,9 @@ create table materials.materials (
     constraint materials_stream_version_positive check (stream_version > 0)
 );
 
-create index materials_student_created_idx on materials.materials (student_id, created_at desc);
+create index materials_student_created_idx on projections.materials (student_id, created_at desc);
 
-create table contextgraph.relations (
+create table projections.relations (
     relation_id uuid primary key,
     student_id uuid not null,
     from_entity_type text not null,
@@ -122,10 +137,10 @@ create table contextgraph.relations (
     constraint relations_stream_version_positive check (stream_version > 0)
 );
 
-create index relations_from_entity_idx on contextgraph.relations (student_id, from_entity_type, from_entity_id) where active = true;
-create index relations_to_entity_idx on contextgraph.relations (student_id, to_entity_type, to_entity_id) where active = true;
+create index relations_from_entity_idx on projections.relations (student_id, from_entity_type, from_entity_id) where active = true;
+create index relations_to_entity_idx on projections.relations (student_id, to_entity_type, to_entity_id) where active = true;
 
-create table assistant.chat_threads (
+create table projections.chat_threads (
     thread_id uuid primary key,
     student_id uuid not null,
     title text not null,
@@ -137,9 +152,9 @@ create table assistant.chat_threads (
     constraint chat_threads_stream_version_positive check (stream_version > 0)
 );
 
-create table assistant.chat_messages (
+create table projections.chat_messages (
     message_id uuid primary key,
-    thread_id uuid not null references assistant.chat_threads (thread_id),
+    thread_id uuid not null references projections.chat_threads (thread_id),
     role text not null,
     content text not null,
     created_at timestamptz not null,
@@ -147,5 +162,5 @@ create table assistant.chat_messages (
     constraint chat_messages_content_not_blank check (length(btrim(content)) > 0)
 );
 
-create index chat_threads_student_recent_idx on assistant.chat_threads (student_id, coalesce(last_message_at, created_at) desc);
-create index chat_messages_thread_created_idx on assistant.chat_messages (thread_id, created_at);
+create index chat_threads_student_recent_idx on projections.chat_threads (student_id, coalesce(last_message_at, created_at) desc);
+create index chat_messages_thread_created_idx on projections.chat_messages (thread_id, created_at);
