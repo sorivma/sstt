@@ -16,6 +16,7 @@ dependencyResolutionManagement {
 rootProject.name = "sstt"
 
 include(
+    "app:web",
     "data:eventstore",
     "data:identity",
     "data:migration",
