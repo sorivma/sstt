@@ -1,4 +1,4 @@
-package com.sstt.data.materials
+﻿package com.sstt.data.materials
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.sstt.data.eventstore.model.StoredEvent
@@ -22,7 +22,7 @@ class MaterialProjection(private val databaseClient: DatabaseClient) : EventProj
     private fun applyRegistered(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            insert into materials.materials (
+            insert into projections.materials (
                 material_id, student_id, file_name, content_type, storage_key, summary,
                 stream_version, created_at, updated_at
             )
@@ -36,7 +36,7 @@ class MaterialProjection(private val databaseClient: DatabaseClient) : EventProj
                 storage_key = excluded.storage_key,
                 stream_version = excluded.stream_version,
                 updated_at = excluded.updated_at
-            where materials.materials.stream_version < excluded.stream_version
+            where projections.materials.stream_version < excluded.stream_version
             """.trimIndent(),
         )
             .bind("material_id", uuid(event.payload["material_id"]))
@@ -55,7 +55,7 @@ class MaterialProjection(private val databaseClient: DatabaseClient) : EventProj
     private fun applySummaryChanged(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            update materials.materials
+            update projections.materials
             set summary = :summary, stream_version = :stream_version, updated_at = :updated_at
             where material_id = :material_id and stream_version < :stream_version
             """.trimIndent(),
@@ -76,6 +76,6 @@ class MaterialProjection(private val databaseClient: DatabaseClient) : EventProj
     }
 
     companion object {
-        const val PROJECTION_NAME = "materials.materials"
+        const val PROJECTION_NAME = "projections.materials"
     }
 }

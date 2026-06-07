@@ -81,7 +81,7 @@
     <h1 class="mt-1 truncate text-2xl font-bold tracking-normal sm:text-3xl" th:text="${title}">Tasks</h1>
     <p class="mt-1 text-sm text-base-content/60" th:text="${subtitle}">Track academic work</p>
   </div>
-  <div class="flex items-center gap-2">
+  <div class="flex shrink-0 items-center gap-2">
     <button class="btn btn-ghost btn-square lg:hidden" type="button" disabled>
       <svg class="icon" aria-hidden="true">
         <use th:href="@{/vendor/lucide/sprite.svg#panel-left}"></use>
@@ -91,7 +91,7 @@
       <svg class="icon" aria-hidden="true">
         <use th:href="@{/vendor/lucide/sprite.svg#plus}"></use>
       </svg>
-      New task
+      <span class="hidden sm:inline">New task</span>
     </button>
   </div>
 </header>

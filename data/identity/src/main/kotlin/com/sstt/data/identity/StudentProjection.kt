@@ -1,4 +1,4 @@
-package com.sstt.data.identity
+﻿package com.sstt.data.identity
 
 import com.sstt.data.eventstore.model.StoredEvent
 import com.sstt.data.eventstore.projection.EventProjection
@@ -8,7 +8,7 @@ import org.springframework.r2dbc.core.DatabaseClient
 import reactor.core.publisher.Mono
 
 /**
- * Projection handler that builds `identity.students` from identity events.
+ * Projection handler that builds `projections.students` from identity events.
  *
  * It is intentionally small and stateless. A projection runner can feed it
  * stored events in global position order and persist runner offsets separately
@@ -30,7 +30,7 @@ class StudentProjection(
     private fun applyStudentRegistered(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            insert into identity.students (
+            insert into projections.students (
                 student_id,
                 full_name,
                 email,
@@ -54,7 +54,7 @@ class StudentProjection(
                 group_name = excluded.group_name,
                 stream_version = excluded.stream_version,
                 updated_at = excluded.updated_at
-            where identity.students.stream_version < excluded.stream_version
+            where projections.students.stream_version < excluded.stream_version
             """.trimIndent(),
         )
             .bindStudentPayload(event)
@@ -67,7 +67,7 @@ class StudentProjection(
     private fun applyStudentProfileChanged(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            update identity.students
+            update projections.students
             set full_name = :full_name,
                 email = :email,
                 group_name = :group_name,
@@ -95,6 +95,6 @@ class StudentProjection(
     }
 
     companion object {
-        const val PROJECTION_NAME = "identity.students"
+        const val PROJECTION_NAME = "projections.students"
     }
 }

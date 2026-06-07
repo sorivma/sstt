@@ -1,4 +1,4 @@
-package com.sstt.data.sources
+﻿package com.sstt.data.sources
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.sstt.data.eventstore.model.StoredEvent
@@ -23,7 +23,7 @@ class SourceMessageProjection(private val databaseClient: DatabaseClient) : Even
     private fun applyAdded(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            insert into sources.source_messages (
+            insert into projections.source_messages (
                 message_id, student_id, source_type, content, status, processing_summary,
                 failure_reason, stream_version, created_at, updated_at
             )
@@ -36,7 +36,7 @@ class SourceMessageProjection(private val databaseClient: DatabaseClient) : Even
                 content = excluded.content,
                 stream_version = excluded.stream_version,
                 updated_at = excluded.updated_at
-            where sources.source_messages.stream_version < excluded.stream_version
+            where projections.source_messages.stream_version < excluded.stream_version
             """.trimIndent(),
         )
             .bind("message_id", uuid(event.payload["message_id"]))
@@ -54,7 +54,7 @@ class SourceMessageProjection(private val databaseClient: DatabaseClient) : Even
     private fun applyStatus(event: StoredEvent, status: String, detailColumn: String): Mono<Void> {
         return databaseClient.sql(
             """
-            update sources.source_messages
+            update projections.source_messages
             set status = :status,
                 $detailColumn = :detail,
                 stream_version = :stream_version,
@@ -79,6 +79,6 @@ class SourceMessageProjection(private val databaseClient: DatabaseClient) : Even
     }
 
     companion object {
-        const val PROJECTION_NAME = "sources.source_messages"
+        const val PROJECTION_NAME = "projections.source_messages"
     }
 }

@@ -17,68 +17,134 @@
       <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <div class="metric-panel">
           <span class="metric-label">Open tasks</span>
-          <strong class="metric-value">0</strong>
+          <strong class="metric-value" th:text="${metrics.openTasks}">0</strong>
         </div>
         <div class="metric-panel">
-          <span class="metric-label">Due this week</span>
-          <strong class="metric-value">0</strong>
+          <span class="metric-label">With deadline</span>
+          <strong class="metric-value" th:text="${metrics.dueWithDeadline}">0</strong>
         </div>
         <div class="metric-panel">
-          <span class="metric-label">Subjects tracked</span>
-          <strong class="metric-value">0</strong>
+          <span class="metric-label">Workflow columns</span>
+          <strong class="metric-value" th:text="${metrics.configuredStatuses}">0</strong>
         </div>
         <div class="metric-panel">
-          <span class="metric-label">Teachers tracked</span>
-          <strong class="metric-value">0</strong>
+          <span class="metric-label">Total tasks</span>
+          <strong class="metric-value" th:text="${metrics.totalTasks}">0</strong>
         </div>
       </section>
 
+      <section id="new-task" class="rounded-box border border-base-300 bg-base-100 p-4 shadow-sm">
+        <form class="grid gap-3 xl:grid-cols-[minmax(240px,1fr)_minmax(180px,260px)_minmax(160px,220px)_minmax(180px,240px)_auto]" method="post" th:action="@{/tasks}" th:object="${taskForm}">
+          <label class="input flex w-full items-center gap-2">
+            <svg class="icon text-base-content/45" aria-hidden="true">
+              <use th:href="@{/vendor/lucide/sprite.svg#plus}"></use>
+            </svg>
+            <input type="text" th:field="*{title}" placeholder="New task title" required>
+          </label>
+          <select class="select w-full" th:field="*{statusKey}">
+            <option th:each="column : ${columns}" th:value="${column.key}" th:text="${column.title}">Todo</option>
+          </select>
+          <select class="select w-full" th:field="*{priority}">
+            <option th:each="priority : ${priorities}" th:value="${priority}" th:text="${#strings.capitalize(#strings.toLowerCase(priority))}">Normal</option>
+          </select>
+          <input class="input w-full" type="datetime-local" th:field="*{deadline}">
+          <button class="btn btn-primary gap-2" type="submit">
+            <svg class="icon" aria-hidden="true">
+              <use th:href="@{/vendor/lucide/sprite.svg#plus}"></use>
+            </svg>
+            Add task
+          </button>
+          <textarea class="textarea xl:col-span-5" rows="2" th:field="*{description}" placeholder="Notes, source context, or checklist draft"></textarea>
+        </form>
+      </section>
+
       <section class="rounded-box border border-base-300 bg-base-100 p-4 shadow-sm">
-        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div class="join w-full lg:max-w-xl">
-            <label class="input join-item flex w-full items-center gap-2">
-              <svg class="icon text-base-content/45" aria-hidden="true">
-                <use th:href="@{/vendor/lucide/sprite.svg#search}"></use>
-              </svg>
-              <input type="search" placeholder="Search tasks" disabled>
-            </label>
-            <button class="btn join-item gap-2" type="button" disabled>
-              <svg class="icon" aria-hidden="true">
-                <use th:href="@{/vendor/lucide/sprite.svg#list-filter}"></use>
-              </svg>
-              Filter
-            </button>
-          </div>
-          <div class="tabs tabs-box">
-            <button class="tab tab-active" type="button">Board</button>
-            <button class="tab" type="button" disabled>List</button>
-          </div>
-        </div>
+        <form class="grid gap-3 md:grid-cols-[minmax(160px,220px)_minmax(220px,1fr)_minmax(160px,220px)_auto]" method="post" th:action="@{/tasks/workflow/statuses}" th:object="${statusForm}">
+          <input class="input w-full" type="text" th:field="*{key}" placeholder="status-key" required>
+          <input class="input w-full" type="text" th:field="*{title}" placeholder="Column title" required>
+          <input class="input w-full" type="text" th:field="*{icon}" placeholder="lucide icon">
+          <button class="btn gap-2" type="submit">
+            <svg class="icon" aria-hidden="true">
+              <use th:href="@{/vendor/lucide/sprite.svg#columns-3}"></use>
+            </svg>
+            Add column
+          </button>
+        </form>
       </section>
 
       <section class="task-board" aria-label="Task board">
         <article class="task-column" th:each="column : ${columns}">
-          <header class="flex items-center justify-between gap-3">
-            <div class="flex min-w-0 items-center gap-2">
-              <span class="flex h-8 w-8 items-center justify-center rounded-box bg-base-200 text-base-content/70">
-                <svg class="icon" aria-hidden="true">
-                  <use th:href="@{'/vendor/lucide/sprite.svg#' + ${column.icon}}"></use>
-                </svg>
-              </span>
-              <h2 class="truncate font-bold tracking-normal" th:text="${column.title}">Todo</h2>
+          <header class="grid gap-3">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex min-w-0 items-center gap-2">
+                <span class="flex h-8 w-8 items-center justify-center rounded-box bg-base-200 text-base-content/70">
+                  <svg class="icon" aria-hidden="true">
+                    <use th:href="@{'/vendor/lucide/sprite.svg#' + ${column.icon}}"></use>
+                  </svg>
+                </span>
+                <h2 class="truncate font-bold tracking-normal" th:text="${column.title}">Todo</h2>
+              </div>
+              <span class="badge badge-outline" th:text="${#lists.size(column.tasks)}">0</span>
             </div>
-            <span class="badge badge-outline" th:text="${#lists.size(column.tasks)}">0</span>
+
+            <div class="flex flex-wrap gap-2">
+              <form method="post" th:action="@{/tasks/workflow/statuses/{statusId}/order(statusId=${column.statusId})}">
+                <input type="hidden" name="direction" value="left">
+                <button class="btn btn-square btn-sm" type="submit" th:disabled="${columnStat.first}" title="Move column left">
+                  <svg class="icon" aria-hidden="true">
+                    <use th:href="@{/vendor/lucide/sprite.svg#arrow-left}"></use>
+                  </svg>
+                </button>
+              </form>
+              <form method="post" th:action="@{/tasks/workflow/statuses/{statusId}/order(statusId=${column.statusId})}">
+                <input type="hidden" name="direction" value="right">
+                <button class="btn btn-square btn-sm" type="submit" th:disabled="${columnStat.last}" title="Move column right">
+                  <svg class="icon" aria-hidden="true">
+                    <use th:href="@{/vendor/lucide/sprite.svg#arrow-right}"></use>
+                  </svg>
+                </button>
+              </form>
+              <form method="post" th:action="@{/tasks/workflow/statuses/{statusId}/disable(statusId=${column.statusId})}">
+                <button class="btn btn-square btn-sm btn-ghost" type="submit" th:disabled="${!#lists.isEmpty(column.tasks)}" title="Disable empty column">
+                  <svg class="icon" aria-hidden="true">
+                    <use th:href="@{/vendor/lucide/sprite.svg#archive}"></use>
+                  </svg>
+                </button>
+              </form>
+            </div>
+
+            <form class="grid grid-cols-[minmax(0,1fr)_88px_auto] gap-2" method="post" th:action="@{/tasks/workflow/statuses/{statusId}(statusId=${column.statusId})}">
+              <input class="input input-sm w-full" type="text" name="title" th:value="${column.title}" required>
+              <input class="input input-sm w-full" type="text" name="icon" th:value="${column.icon}">
+              <button class="btn btn-sm btn-square" type="submit" title="Save column">
+                <svg class="icon" aria-hidden="true">
+                  <use th:href="@{/vendor/lucide/sprite.svg#save}"></use>
+                </svg>
+              </button>
+            </form>
           </header>
 
           <div class="mt-4 grid gap-3" th:if="${!#lists.isEmpty(column.tasks)}">
-            <a class="task-card" href="#" th:each="task : ${column.tasks}">
-              <h3 class="font-semibold tracking-normal" th:text="${task.title}">Task title</h3>
-              <div class="mt-3 flex flex-wrap gap-2">
-                <span class="badge badge-info" th:if="${task.subject != null}" th:text="${task.subject}">Subject</span>
-                <span class="badge" th:if="${task.teacher != null}" th:text="${task.teacher}">Teacher</span>
-                <span class="badge badge-outline" th:if="${task.semester != null}" th:text="${task.semester}">Semester</span>
+            <article class="task-card" th:each="task : ${column.tasks}">
+              <div class="flex items-start justify-between gap-3">
+                <h3 class="font-semibold tracking-normal" th:text="${task.title}">Task title</h3>
+                <span class="badge badge-outline uppercase" th:if="${task.priority != null}" th:text="${task.priority}">normal</span>
               </div>
-            </a>
+              <p class="mt-2 text-sm text-base-content/60" th:if="${task.description != null}" th:text="${task.description}">Description</p>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <span class="badge badge-info" th:if="${task.deadline != null}" th:text="${task.deadline}">Deadline</span>
+              </div>
+              <form class="mt-3 flex gap-2" method="post" th:action="@{/tasks/{taskId}/status(taskId=${task.id})}">
+                <select class="select select-sm min-w-0 flex-1" name="statusKey">
+                  <option th:each="target : ${columns}" th:value="${target.key}" th:text="${target.title}" th:selected="${target.key == column.key}">Todo</option>
+                </select>
+                <button class="btn btn-sm btn-square" type="submit" title="Move task">
+                  <svg class="icon" aria-hidden="true">
+                    <use th:href="@{/vendor/lucide/sprite.svg#move-right}"></use>
+                  </svg>
+                </button>
+              </form>
+            </article>
           </div>
 
           <div class="empty-column" th:if="${#lists.isEmpty(column.tasks)}">

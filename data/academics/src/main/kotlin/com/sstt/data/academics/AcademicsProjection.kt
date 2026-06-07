@@ -1,4 +1,4 @@
-package com.sstt.data.academics
+﻿package com.sstt.data.academics
 
 import com.sstt.data.academics.events.AcademicsEventTypes
 import com.sstt.data.eventstore.model.StoredEvent
@@ -25,15 +25,15 @@ class AcademicsProjection(private val databaseClient: DatabaseClient) : EventPro
     private fun upsertSubject(event: StoredEvent, includeCreatedAt: Boolean): Mono<Void> {
         val sql = if (includeCreatedAt) {
             """
-            insert into academics.subjects (subject_id, name, stream_version, created_at, updated_at)
+            insert into projections.subjects (subject_id, name, stream_version, created_at, updated_at)
             values (:subject_id, :name, :stream_version, :created_at, :updated_at)
             on conflict (subject_id) do update
             set name = excluded.name, stream_version = excluded.stream_version, updated_at = excluded.updated_at
-            where academics.subjects.stream_version < excluded.stream_version
+            where projections.subjects.stream_version < excluded.stream_version
             """.trimIndent()
         } else {
             """
-            update academics.subjects
+            update projections.subjects
             set name = :name, stream_version = :stream_version, updated_at = :updated_at
             where subject_id = :subject_id and stream_version < :stream_version
             """.trimIndent()
@@ -50,15 +50,15 @@ class AcademicsProjection(private val databaseClient: DatabaseClient) : EventPro
     private fun upsertTeacher(event: StoredEvent, includeCreatedAt: Boolean): Mono<Void> {
         val sql = if (includeCreatedAt) {
             """
-            insert into academics.teachers (teacher_id, full_name, email, stream_version, created_at, updated_at)
+            insert into projections.teachers (teacher_id, full_name, email, stream_version, created_at, updated_at)
             values (:teacher_id, :full_name, :email, :stream_version, :created_at, :updated_at)
             on conflict (teacher_id) do update
             set full_name = excluded.full_name, email = excluded.email, stream_version = excluded.stream_version, updated_at = excluded.updated_at
-            where academics.teachers.stream_version < excluded.stream_version
+            where projections.teachers.stream_version < excluded.stream_version
             """.trimIndent()
         } else {
             """
-            update academics.teachers
+            update projections.teachers
             set full_name = :full_name, email = :email, stream_version = :stream_version, updated_at = :updated_at
             where teacher_id = :teacher_id and stream_version < :stream_version
             """.trimIndent()
@@ -76,12 +76,12 @@ class AcademicsProjection(private val databaseClient: DatabaseClient) : EventPro
     private fun upsertSemester(event: StoredEvent): Mono<Void> {
         return databaseClient.sql(
             """
-            insert into academics.semesters (semester_id, name, starts_on, ends_on, stream_version, created_at, updated_at)
+            insert into projections.semesters (semester_id, name, starts_on, ends_on, stream_version, created_at, updated_at)
             values (:semester_id, :name, :starts_on, :ends_on, :stream_version, :created_at, :updated_at)
             on conflict (semester_id) do update
             set name = excluded.name, starts_on = excluded.starts_on, ends_on = excluded.ends_on,
                 stream_version = excluded.stream_version, updated_at = excluded.updated_at
-            where academics.semesters.stream_version < excluded.stream_version
+            where projections.semesters.stream_version < excluded.stream_version
             """.trimIndent(),
         )
             .bind("semester_id", UUID.fromString(event.payload["semester_id"].asText()))
@@ -105,6 +105,6 @@ class AcademicsProjection(private val databaseClient: DatabaseClient) : EventPro
     }
 
     companion object {
-        const val PROJECTION_NAME = "academics.catalog"
+        const val PROJECTION_NAME = "projections.academics_catalog"
     }
 }

@@ -1,4 +1,4 @@
-package com.sstt.data.identity
+﻿package com.sstt.data.identity
 
 import com.sstt.data.identity.model.StudentRecord
 import java.time.Instant
@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 /**
- * Reactive reader for the `identity.students` projection table.
+ * Reactive reader for the `projections.students` projection table.
  *
  * Consumers use this repository for current student profile queries. The table
  * is rebuildable from the event log, so this repository deliberately exposes
@@ -21,7 +21,7 @@ class StudentReadRepository(
         return databaseClient.sql(
             """
             select student_id, full_name, email, group_name, stream_version, created_at, updated_at
-            from identity.students
+            from projections.students
             where student_id = :student_id
             """.trimIndent(),
         )
@@ -34,7 +34,7 @@ class StudentReadRepository(
         return databaseClient.sql(
             """
             select student_id, full_name, email, group_name, stream_version, created_at, updated_at
-            from identity.students
+            from projections.students
             order by full_name, student_id
             """.trimIndent(),
         )

@@ -1,4 +1,4 @@
-package com.sstt.data.identity
+﻿package com.sstt.data.identity
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sstt.data.eventstore.model.StoredEvent
@@ -153,7 +153,7 @@ class StudentProjectionIntegrationTest {
                 System.getenv("SSTT_IDENTITY_INTEGRATION_TESTS") == "true" &&
                 this::databaseClient.isInitialized
             ) {
-                databaseClient.sql("drop schema if exists identity cascade")
+                databaseClient.sql("drop schema if exists projections cascade")
                     .fetch()
                     .rowsUpdated()
                     .then(databaseClient.sql("drop schema if exists eventstore cascade").fetch().rowsUpdated())
@@ -163,7 +163,7 @@ class StudentProjectionIntegrationTest {
         }
 
         private fun resetSchemas() {
-            databaseClient.sql("drop schema if exists identity cascade")
+            databaseClient.sql("drop schema if exists projections cascade")
                 .fetch()
                 .rowsUpdated()
                 .then(databaseClient.sql("drop schema if exists eventstore cascade").fetch().rowsUpdated())

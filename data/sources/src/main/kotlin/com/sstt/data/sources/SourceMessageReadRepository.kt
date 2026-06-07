@@ -1,4 +1,4 @@
-package com.sstt.data.sources
+﻿package com.sstt.data.sources
 
 import com.sstt.data.sources.model.SourceMessageRecord
 import com.sstt.data.sources.model.SourceMessageStatus
@@ -28,7 +28,7 @@ class SourceMessageReadRepository(private val databaseClient: DatabaseClient) {
             """
             select message_id, student_id, source_type, content, status, processing_summary,
                    failure_reason, stream_version, created_at, updated_at
-            from sources.source_messages
+            from projections.source_messages
             $whereClause
             """.trimIndent(),
         )
