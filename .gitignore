@@ -1,2 +1,8 @@
 DESIGN.md
 
+.gradle/
+build/
+out/
+
+*.class
+*.log
