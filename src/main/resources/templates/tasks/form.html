@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Новая задача - SSTT</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header th:replace="~{fragments/layout :: topbar}"></header>
+<main class="container">
+    <div class="page-head">
+        <div>
+            <h1>Новая задача</h1>
+            <div class="muted">Проверь черновик и сохрани задачу в трекер.</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <form class="panel" method="post" th:action="@{/tasks}" th:object="${taskForm}">
+            <input type="hidden" th:field="*{sourceMessageId}">
+            <input type="hidden" th:field="*{confidence}">
+
+            <label>
+                Название
+                <input th:field="*{title}" maxlength="255">
+                <span class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Ошибка</span>
+            </label>
+
+            <label>
+                Описание
+                <textarea th:field="*{description}"></textarea>
+            </label>
+
+            <div class="form-grid">
+                <label>
+                    Предмет
+                    <select th:field="*{subjectId}">
+                        <option th:value="${null}">Без предмета</option>
+                        <option th:each="subject : ${subjects}" th:value="${subject.id()}" th:text="${subject.name()}"></option>
+                    </select>
+                </label>
+
+                <label>
+                    Преподаватель
+                    <select th:field="*{teacherId}">
+                        <option th:value="${null}">Без преподавателя</option>
+                        <option th:each="teacher : ${teachers}" th:value="${teacher.id()}" th:text="${teacher.fullName()}"></option>
+                    </select>
+                </label>
+
+                <label>
+                    Дедлайн
+                    <input type="date" th:field="*{deadlineDate}">
+                </label>
+
+                <label>
+                    Тип
+                    <select th:field="*{type}">
+                        <option th:each="type : ${types}" th:value="${type}" th:text="${type}"></option>
+                    </select>
+                </label>
+
+                <label>
+                    Статус
+                    <select th:field="*{status}">
+                        <option th:each="status : ${statuses}" th:value="${status}" th:text="${status}"></option>
+                    </select>
+                </label>
+
+                <label>
+                    Приоритет
+                    <select th:field="*{priority}">
+                        <option th:each="priority : ${priorities}" th:value="${priority}" th:text="${priority}"></option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="actions">
+                <button type="submit">Сохранить задачу</button>
+                <a class="button secondary" th:href="@{/tasks}">Отмена</a>
+            </div>
+        </form>
+
+        <aside class="panel" th:if="${sourceMessage != null}">
+            <h2>Исходное сообщение</h2>
+            <div class="muted" th:text="${sourceMessage.sourceType()}">MANUAL</div>
+            <pre class="source-text" th:text="${sourceMessage.rawText()}">Текст</pre>
+        </aside>
+    </div>
+</main>
+</body>
+</html>
