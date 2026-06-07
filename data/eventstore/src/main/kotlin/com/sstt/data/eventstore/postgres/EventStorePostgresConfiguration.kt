@@ -3,6 +3,8 @@ package com.sstt.data.eventstore.postgres
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sstt.data.eventstore.api.EventStore
 import com.sstt.data.eventstore.api.ProjectionOffsetStore
+import com.sstt.data.eventstore.projection.EventProjection
+import com.sstt.data.eventstore.projection.ReactiveProjectionRunner
 import java.time.Clock
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.context.annotation.Bean
@@ -50,6 +52,22 @@ class EventStorePostgresConfiguration {
         return PostgreSqlProjectionOffsetStore(
             databaseClient = databaseClient,
             clock = clockProvider.getIfAvailable { Clock.systemUTC() },
+        )
+    }
+
+    /**
+     * Exposes a reusable reactive polling runner for all registered projections.
+     */
+    @Bean
+    fun reactiveProjectionRunner(
+        eventStore: EventStore,
+        projectionOffsetStore: ProjectionOffsetStore,
+        projections: ObjectProvider<EventProjection>,
+    ): ReactiveProjectionRunner {
+        return ReactiveProjectionRunner(
+            eventStore = eventStore,
+            offsetStore = projectionOffsetStore,
+            projections = projections.orderedStream().toList(),
         )
     }
 }
