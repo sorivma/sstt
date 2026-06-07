@@ -14,3 +14,8 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "sstt"
+
+include(
+    "data:eventstore",
+    "data:migration",
+)
