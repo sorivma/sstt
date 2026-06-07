@@ -6,6 +6,7 @@ object SsttLibraries {
     const val r2dbcPostgresql = "org.postgresql:r2dbc-postgresql"
     const val reactorTest = "io.projectreactor:reactor-test"
     const val springJdbc = "org.springframework:spring-jdbc"
+    const val springContext = "org.springframework:spring-context"
     const val springR2dbc = "org.springframework:spring-r2dbc"
     const val r2dbcPool = "io.r2dbc:r2dbc-pool"
     const val springTx = "org.springframework:spring-tx"
