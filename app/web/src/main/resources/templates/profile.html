@@ -7,21 +7,13 @@
   <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body class="bg-base-100 text-base-content">
-<main class="app-shell">
-  <header class="mb-6 flex flex-col gap-4 border-b border-base-300 pb-5 sm:flex-row sm:items-center sm:justify-between">
-    <div>
-      <p class="text-sm font-semibold uppercase tracking-normal text-secondary">Identity</p>
-      <h1 class="mt-1 text-3xl font-bold tracking-normal text-base-content">Student profile</h1>
-    </div>
-    <div class="badge badge-outline gap-2 px-3 py-3 font-medium">
-      <svg class="icon" aria-hidden="true">
-        <use th:href="@{/vendor/lucide/sprite.svg#id-card}"></use>
-      </svg>
-      Projection backed
-    </div>
-  </header>
+<div class="app-frame">
+  <aside th:replace="~{fragments/app-shell :: sidebar('profile')}"></aside>
 
-  <section class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(360px,440px)]">
+  <div class="app-main">
+    <header th:replace="~{fragments/app-shell :: topbar('Student profile', 'Identity card and account details')}"></header>
+
+    <main class="grid gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,440px)] lg:p-8">
     <aside class="rounded-box border border-base-300 bg-base-100 p-6 shadow-sm">
       <div class="flex items-start gap-4">
         <div class="flex h-12 w-12 items-center justify-center rounded-box bg-primary text-primary-content">
@@ -101,7 +93,8 @@
         </button>
       </div>
     </form>
-  </section>
-</main>
+    </main>
+  </div>
+</div>
 </body>
 </html>

@@ -17,7 +17,7 @@ import jakarta.validation.Valid
 class ProfilePageController(
     private val profileService: CurrentStudentProfileService,
 ) {
-    @GetMapping("/", "/profile")
+    @GetMapping("/profile")
     fun profile(model: Model): Mono<String> {
         return profileService.currentProfile()
             .map { student ->

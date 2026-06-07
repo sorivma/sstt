@@ -56,6 +56,70 @@
     @apply mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8;
   }
 
+  .app-frame {
+    @apply grid min-h-screen bg-base-200/70 lg:grid-cols-[280px_minmax(0,1fr)];
+  }
+
+  .app-sidebar {
+    @apply hidden border-r border-base-300 bg-base-100 px-3 py-5 lg:flex lg:min-h-screen lg:flex-col;
+  }
+
+  .app-main {
+    @apply min-w-0;
+  }
+
+  .app-topbar {
+    @apply sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-base-300 bg-base-100/95 px-4 py-4 shadow-sm backdrop-blur sm:px-6 lg:px-8;
+  }
+
+  .app-nav-item {
+    @apply flex items-center gap-3 rounded-box px-3 py-2.5 text-sm font-semibold text-base-content/70 transition-colors;
+  }
+
+  .app-nav-item:hover {
+    @apply bg-base-200 text-base-content;
+  }
+
+  .app-nav-item-active {
+    @apply bg-primary text-primary-content;
+  }
+
+  .app-nav-item-active:hover {
+    @apply bg-primary text-primary-content;
+  }
+
+  .metric-panel {
+    @apply rounded-box border border-base-300 bg-base-100 p-4 shadow-sm;
+  }
+
+  .metric-label {
+    @apply block text-sm font-semibold text-base-content/60;
+  }
+
+  .metric-value {
+    @apply mt-2 block text-3xl font-bold tracking-normal text-base-content;
+  }
+
+  .task-board {
+    @apply grid gap-4 overflow-x-auto pb-2 lg:grid-cols-5;
+  }
+
+  .task-column {
+    @apply min-h-[420px] min-w-[260px] rounded-box border border-base-300 bg-base-100 p-4 shadow-sm;
+  }
+
+  .task-card {
+    @apply block rounded-box border border-base-300 bg-base-100 p-4 shadow-sm transition-colors;
+  }
+
+  .task-card:hover {
+    @apply border-primary;
+  }
+
+  .empty-column {
+    @apply mt-4 grid min-h-32 place-items-center rounded-box border border-dashed border-base-300 bg-base-200/50 p-4 text-center text-sm font-medium text-base-content/55;
+  }
+
   .icon {
     @apply h-4 w-4 shrink-0;
     stroke-width: 2;
