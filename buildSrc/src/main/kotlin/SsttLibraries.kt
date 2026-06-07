@@ -1,0 +1,19 @@
+object SsttLibraries {
+    const val springBootBom = "org.springframework.boot:spring-boot-dependencies:${SsttVersions.springBoot}"
+
+    const val jacksonDatabind = "com.fasterxml.jackson.core:jackson-databind"
+    const val reactorCore = "io.projectreactor:reactor-core"
+    const val r2dbcPostgresql = "org.postgresql:r2dbc-postgresql"
+    const val reactorTest = "io.projectreactor:reactor-test"
+    const val springJdbc = "org.springframework:spring-jdbc"
+    const val springR2dbc = "org.springframework:spring-r2dbc"
+    const val r2dbcPool = "io.r2dbc:r2dbc-pool"
+    const val springTx = "org.springframework:spring-tx"
+    const val flywayCore = "org.flywaydb:flyway-core"
+    const val flywayPostgresql = "org.flywaydb:flyway-database-postgresql"
+    const val postgresql = "org.postgresql:postgresql"
+
+    const val springBootStarterTest = "org.springframework.boot:spring-boot-starter-test"
+    const val junitPlatformLauncher = "org.junit.platform:junit-platform-launcher"
+    const val h2 = "com.h2database:h2"
+}
