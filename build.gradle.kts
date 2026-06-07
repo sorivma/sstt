@@ -30,3 +30,30 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+val isWindows = System.getProperty("os.name").lowercase().contains("windows")
+
+tasks.register<Exec>("dockerComposeUp") {
+    group = "application"
+    description = "Starts the local PostgreSQL container and waits until it is healthy."
+
+    if (isWindows) {
+        commandLine("cmd", "/c", "docker compose up -d --wait postgres")
+    } else {
+        commandLine("sh", "-c", "docker compose up -d --wait postgres")
+    }
+}
+
+tasks.named("test") {
+    mustRunAfter("dockerComposeUp")
+}
+
+tasks.named("bootRun") {
+    mustRunAfter("test")
+}
+
+tasks.register("localDev") {
+    group = "application"
+    description = "Starts local dependencies, runs tests, and launches the service with Flyway migrations."
+    dependsOn("dockerComposeUp", "test", "bootRun")
+}
+
