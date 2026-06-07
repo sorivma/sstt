@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "scripts": {
+    "assets:build": "npm run icons:build && npm run css:build",
+    "css:build": "tailwindcss -i ./app/web/src/main/resources/assets/css/app.css -o ./app/web/src/main/resources/static/css/app.css --minify",
+    "css:watch": "tailwindcss -i ./app/web/src/main/resources/assets/css/app.css -o ./app/web/src/main/resources/static/css/app.css --watch",
+    "icons:build": "node ./scripts/copy-lucide-sprite.mjs"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.0",
+    "daisyui": "5.5.23",
+    "lucide-static": "1.17.0",
+    "tailwindcss": "4.3.0"
+  }
+}

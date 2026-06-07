@@ -1,57 +1,100 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" data-theme="sstt" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Student Profile</title>
   <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
-<main class="shell">
-  <section class="profile-layout">
-    <div class="profile-summary">
-      <p class="eyebrow">Student card</p>
-      <h1 th:text="${student != null ? student.fullName : 'Student profile'}">Student profile</h1>
-      <dl th:if="${student != null}">
-        <div>
-          <dt>Email</dt>
-          <dd th:text="${student.email}">student@example.com</dd>
+<body class="bg-base-100 text-base-content">
+<div class="app-frame">
+  <aside th:replace="~{fragments/app-shell :: sidebar('profile')}"></aside>
+
+  <div class="app-main">
+    <header th:replace="~{fragments/app-shell :: topbar('Student profile', 'Identity card and account details')}"></header>
+
+    <main class="grid gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,440px)] lg:p-8">
+    <aside class="rounded-box border border-base-300 bg-base-100 p-6 shadow-sm">
+      <div class="flex items-start gap-4">
+        <div class="flex h-12 w-12 items-center justify-center rounded-box bg-primary text-primary-content">
+          <svg class="h-6 w-6" aria-hidden="true">
+            <use th:href="@{/vendor/lucide/sprite.svg#user}"></use>
+          </svg>
         </div>
-        <div>
-          <dt>Group</dt>
-          <dd th:text="${student.groupName}">IKBO-00-00</dd>
+        <div class="min-w-0">
+          <p class="text-sm font-semibold text-base-content/60">Student card</p>
+          <h2 class="mt-1 break-words text-2xl font-bold tracking-normal" th:text="${student != null ? student.fullName : 'Student profile'}">Student profile</h2>
         </div>
-        <div>
-          <dt>Stream version</dt>
-          <dd th:text="${student.streamVersion}">1</dd>
+      </div>
+
+      <div class="mt-6 grid gap-3" th:if="${student != null}">
+        <div class="rounded-box border border-base-300 bg-base-200/60 p-4">
+          <div class="flex items-center gap-2 text-sm font-semibold text-base-content/60">
+            <svg class="icon" aria-hidden="true">
+              <use th:href="@{/vendor/lucide/sprite.svg#mail}"></use>
+            </svg>
+            Email
+          </div>
+          <p class="mt-2 break-words font-semibold" th:text="${student.email}">student@example.com</p>
         </div>
-      </dl>
-    </div>
+        <div class="rounded-box border border-base-300 bg-base-200/60 p-4">
+          <div class="flex items-center gap-2 text-sm font-semibold text-base-content/60">
+            <svg class="icon" aria-hidden="true">
+              <use th:href="@{/vendor/lucide/sprite.svg#users}"></use>
+            </svg>
+            Group
+          </div>
+          <p class="mt-2 font-semibold" th:text="${student.groupName}">IKBO-00-00</p>
+        </div>
+        <div class="rounded-box border border-base-300 bg-base-200/60 p-4">
+          <div class="flex items-center gap-2 text-sm font-semibold text-base-content/60">
+            <svg class="icon" aria-hidden="true">
+              <use th:href="@{/vendor/lucide/sprite.svg#git-commit-horizontal}"></use>
+            </svg>
+            Stream version
+          </div>
+          <p class="mt-2 font-semibold" th:text="${student.streamVersion}">1</p>
+        </div>
+      </div>
+    </aside>
 
-    <form class="profile-form" method="post" th:action="@{/profile}" th:object="${profileForm}">
-      <div class="notice" th:if="${saved}">Profile updated</div>
+    <form class="rounded-box border border-base-300 bg-base-100 p-6 shadow-sm" method="post" th:action="@{/profile}" th:object="${profileForm}">
+      <div class="alert alert-success mb-5 items-center" th:if="${saved}">
+        <svg class="icon" aria-hidden="true">
+          <use th:href="@{/vendor/lucide/sprite.svg#circle-check}"></use>
+        </svg>
+        <span>Profile updated</span>
+      </div>
 
-      <label>
-        <span>Full name</span>
-        <input type="text" th:field="*{fullName}" autocomplete="name">
-        <small th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Required</small>
-      </label>
+      <div class="grid gap-4">
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Full name</legend>
+          <input class="input w-full" type="text" th:field="*{fullName}" autocomplete="name">
+          <p class="label text-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Required</p>
+        </fieldset>
 
-      <label>
-        <span>Email</span>
-        <input type="email" th:field="*{email}" autocomplete="email">
-        <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Invalid email</small>
-      </label>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Email</legend>
+          <input class="input w-full" type="email" th:field="*{email}" autocomplete="email">
+          <p class="label text-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Invalid email</p>
+        </fieldset>
 
-      <label>
-        <span>Group</span>
-        <input type="text" th:field="*{groupName}">
-        <small th:if="${#fields.hasErrors('groupName')}" th:errors="*{groupName}">Required</small>
-      </label>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Group</legend>
+          <input class="input w-full" type="text" th:field="*{groupName}">
+          <p class="label text-error" th:if="${#fields.hasErrors('groupName')}" th:errors="*{groupName}">Required</p>
+        </fieldset>
 
-      <button type="submit">Save profile</button>
+        <button class="btn btn-primary mt-2 gap-2" type="submit">
+          <svg class="icon" aria-hidden="true">
+            <use th:href="@{/vendor/lucide/sprite.svg#save}"></use>
+          </svg>
+          Save profile
+        </button>
+      </div>
     </form>
-  </section>
-</main>
+    </main>
+  </div>
+</div>
 </body>
 </html>

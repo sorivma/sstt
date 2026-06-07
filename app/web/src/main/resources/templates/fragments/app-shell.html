@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" data-theme="sstt" xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside class="app-sidebar" th:fragment="sidebar(activePage)">
+  <a class="flex items-center gap-3 px-3" th:href="@{/tasks}">
+    <span class="flex h-10 w-10 items-center justify-center rounded-box bg-primary text-primary-content">
+      <svg class="h-5 w-5" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#graduation-cap}"></use>
+      </svg>
+    </span>
+    <span class="min-w-0">
+      <span class="block text-sm font-bold tracking-normal">SSTT</span>
+      <span class="block truncate text-xs font-medium text-base-content/55">Student task tracker</span>
+    </span>
+  </a>
+
+  <nav class="mt-6 grid gap-1 px-2">
+    <a class="app-nav-item" th:classappend="${activePage == 'dashboard'} ? ' app-nav-item-active'" href="#">
+      <svg class="icon" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#layout-dashboard}"></use>
+      </svg>
+      Dashboard
+    </a>
+    <a class="app-nav-item" th:classappend="${activePage == 'tasks'} ? ' app-nav-item-active'" th:href="@{/tasks}">
+      <svg class="icon" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#kanban}"></use>
+      </svg>
+      Tasks
+    </a>
+    <a class="app-nav-item" th:classappend="${activePage == 'subjects'} ? ' app-nav-item-active'" href="#">
+      <svg class="icon" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#book-open}"></use>
+      </svg>
+      Subjects
+    </a>
+    <a class="app-nav-item" th:classappend="${activePage == 'teachers'} ? ' app-nav-item-active'" href="#">
+      <svg class="icon" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#users}"></use>
+      </svg>
+      Teachers
+    </a>
+    <a class="app-nav-item" th:classappend="${activePage == 'semesters'} ? ' app-nav-item-active'" href="#">
+      <svg class="icon" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#calendar-days}"></use>
+      </svg>
+      Semesters
+    </a>
+    <a class="app-nav-item" th:classappend="${activePage == 'sources'} ? ' app-nav-item-active'" href="#">
+      <svg class="icon" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#inbox}"></use>
+      </svg>
+      Sources
+    </a>
+    <a class="app-nav-item" th:classappend="${activePage == 'materials'} ? ' app-nav-item-active'" href="#">
+      <svg class="icon" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#files}"></use>
+      </svg>
+      Materials
+    </a>
+    <a class="app-nav-item" th:classappend="${activePage == 'assistant'} ? ' app-nav-item-active'" href="#">
+      <svg class="icon" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#bot}"></use>
+      </svg>
+      Assistant
+    </a>
+  </nav>
+
+  <div class="mt-auto border-t border-base-300 px-2 pt-4">
+    <a class="app-nav-item" th:classappend="${activePage == 'profile'} ? ' app-nav-item-active'" th:href="@{/profile}">
+      <svg class="icon" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#user}"></use>
+      </svg>
+      Profile
+    </a>
+  </div>
+</aside>
+
+<header class="app-topbar" th:fragment="topbar(title, subtitle)">
+  <div class="min-w-0">
+    <p class="text-sm font-semibold uppercase tracking-normal text-secondary">Spring semester</p>
+    <h1 class="mt-1 truncate text-2xl font-bold tracking-normal sm:text-3xl" th:text="${title}">Tasks</h1>
+    <p class="mt-1 text-sm text-base-content/60" th:text="${subtitle}">Track academic work</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <button class="btn btn-ghost btn-square lg:hidden" type="button" disabled>
+      <svg class="icon" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#panel-left}"></use>
+      </svg>
+    </button>
+    <button class="btn btn-primary gap-2" type="button" disabled>
+      <svg class="icon" aria-hidden="true">
+        <use th:href="@{/vendor/lucide/sprite.svg#plus}"></use>
+      </svg>
+      New task
+    </button>
+  </div>
+</header>
+</body>
+</html>
