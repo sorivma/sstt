@@ -5,6 +5,7 @@
 - Use `main` only for production-ready code.
 - Use `develop` as the integration branch for upcoming work.
 - Do not commit directly to `main` or `develop` unless the user explicitly requests it.
+- After completing work on a feature branch, automatically open a pull request into `develop`.
 - Create feature branches from `develop` using `feature/<short-description>`.
 - Create release branches from `develop` using `release/<version>`.
 - Create hotfix branches from `main` using `hotfix/<short-description>`.
